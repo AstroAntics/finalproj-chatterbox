@@ -1,5 +1,5 @@
 // Pull in required imports
-import express from "express";
+import express, { response } from "express";
 import bodyParser from "body-parser";
 import mongoose from "mongoose";
 import cors from "cors";
@@ -65,6 +65,8 @@ const storageBag = multer.diskStorage({
 // Must call the Multer constructor here (read the docs!)
 const uploads = multer({ storageBag });
 
+app.get("/", (req, res) => {res.send("Welcome to the Main Page!")});
+
 //  ROUTE BLOCKS
 // TODO move these into separate sections if I have time, otherwise it isn't worth it
 app.use("/secure", secureRoutes);
@@ -73,4 +75,4 @@ app.use("/post", postRoutes);
 
 // Routes with files attached
 app.post("/register", uploads.single("avatar"), createAccount);
-app.post("/post", upload.single("snapshot"), makePost);
+app.post("/post", uploads.single("snapshot"), createPost);
