@@ -47,6 +47,7 @@ app.use(helmet());
 app.use(cors());
 app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" })); // Work with CORS to enable X-site requests
 app.use(morgan("common")); // Setup morgan logger et. al.
+// app.set('view engine', 'ejs');
 
 // Public log file
 app.use("/static", express.static(path.join(dirName, "public/static")));
@@ -63,9 +64,14 @@ const storageBag = multer.diskStorage({
 });
 
 // Must call the Multer constructor here (read the docs!)
-const uploads = multer({ storageBag });
+const uploads = multer({storageBag});
 
-app.get("/", (req, res) => {res.send("Welcome to the Main Page!")});
+// Root route (hey, that rhymes)
+// EJS route
+// app.get('/', (req, res) => {
+//   res.render('pages/homepage');
+// });
+app.get("/", (req, res) => res.json({message: "You are at the home page."}));
 
 //  ROUTE BLOCKS
 // TODO move these into separate sections if I have time, otherwise it isn't worth it

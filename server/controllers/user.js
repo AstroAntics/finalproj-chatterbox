@@ -75,6 +75,10 @@ export const loginToAccount = async (req, res) => {
   }
 };
 
+export const logoutFromAccount = async (req, res) => {
+  res.json({ message: "You may log out by deleting your cookies." });
+};
+
 export const getSelf = async (req, res) => {
   try {
     const { id } = req.params;
@@ -87,14 +91,33 @@ export const getSelf = async (req, res) => {
 
 export const getSelfFriends = async (req, res) => {
   try {
-    const {id} = req.params;
+    const { id } = req.params;
     const account = await Account.findById(id);
     const friends = await Promise.all(
-      account.friends.map((id) => {Account.findById(id)})
+      account.friends.map((id) => {
+        Account.findById(id);
+      })
     );
     if (friends !== null) res.status(200).json(friends);
   } catch (error) {
-    res.status(400).json({message: error.message});
+    res.status(400).json({ message: error.message });
+  }
+};
+
+export const deleteAccount = async (req, res) => {
+  try {
+    const { uid } = req.params;
+    const account = await Account.findById(id);
+    if (account) {
+      const wasDeleted = await Account.deleteOne({ uid });
+      if (wasDeleted) {
+        res.status(200).json({ message: "Account deleted." });
+      } else {
+        res.status(400).json({ message: "Something went wrong. Please try again." });
+      }
+    }
+  } catch (error) {
+    res.status(400).json({ message: error.message });
   }
 };
 

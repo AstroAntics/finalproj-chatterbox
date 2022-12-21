@@ -5,10 +5,10 @@ import {getFeedPosts, getAccountPosts, addLikeToPost, removeLikeFromPost, create
 // Switching to FE side of things
 const router = express.Router();
 
-router.get("/", getFeedPosts);
+router.get("/all", getFeedPosts);
 router.get("/:accountId/posts", getAccountPosts);
 router.patch("/:postId/like", addLikeToPost);
 router.patch("/:postId/unlike", removeLikeFromPost);
-router.post("/create/post", createPost);
+router.post("/create", createPost);
 
 export default router;
