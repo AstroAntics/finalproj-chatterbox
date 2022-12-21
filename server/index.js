@@ -9,6 +9,7 @@ import helmet from "helmet";
 import morgan from "morgan";
 import path from "path";
 import { fileURLToPath } from "url";
+import { createAccount } from "./controllers/user.js";
 
 // HANDLE PRE-SETUP VARIABLES
 const fileName = fileURLToPath(import.meta.url); // Set up file path
@@ -58,3 +59,12 @@ const storageBag = multer.diskStorage({
 
 // Must call the Multer constructor here (read the docs!)
 const uploads = multer({ storageBag });
+
+// ROUTE BLOCK
+// TODO move these into separate sections if I have time, otherwise it isn't worth it
+
+/**
+ * Register an account.
+ * Accepts an `avatar` for the user avatar.
+ */
+app.post("/register", uploads.single("avatar"), createAccount);
