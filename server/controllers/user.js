@@ -21,7 +21,6 @@ export const createAccount = async (req, res) => {
       friends,
       likes,
     } = req.body;
-    const randomSalt = bcrypt.genSalt(); // Do random bcrypt gen here (thanks StackOverflow)
     const cleanPw = password.toString();
     const hashedPw = await bcrypt.hash(cleanPw, 10);
     const acc = new Account({
@@ -56,18 +55,55 @@ export const loginToAccount = async (req, res) => {
 
     if (!account) res.status(404).json({ message: "User does not exist." }); // Can't really do anything here :/
 
-    const doPasswordsMatch = await bcrypt.compare(password, account.password, () => {});
-    if (!doPasswordsMatch) // Whoops, that's a swing and a miss!
+    const doPasswordsMatch = await bcrypt.compare(
+      password,
+      account.password,
+      () => {}
+    );
+    if (!doPasswordsMatch)
+      // Whoops, that's a swing and a miss!
       res.status(403).json({ message: "Incorrect email address or password." });
 
     // Sign in using our web token
-    const loginToken = jwt.sign({id: account._id}, process.env.TOKEN_KEY);
+    const loginToken = jwt.sign({ id: account._id }, process.env.TOKEN_KEY);
     delete user.password; // Just to make sure we didn't leave anything lying around.
 
     // Finally, we're done if everything worked out well so far - spit out the token and let's go.
-    res.status(200).json({loginToken, account});
-
+    res.status(200).json({ loginToken, account });
   } catch (error) {
     res.json({ message: error.message }); // Using .status() triggered a bug, this (supposedly) fixes it.
   }
+};
+
+export const getSelf = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const account = await Account.findById(id);
+    if (account !== null) res.status(200).json(account);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+export const getSelfFriends = async (req, res) => {
+  try {
+    const {id} = req.params;
+    const account = await Account.findById(id);
+    const friends = await Promise.all(
+      account.friends.map((id) => {Account.findById(id)})
+    );
+    if (friends !== null) res.status(200).json(friends);
+  } catch (error) {
+    res.status(400).json({message: error.message});
+  }
+};
+
+export const addFriend = async (req, res) => {
+  // Not implemented yet
+  res.send("OK");
+};
+
+export const removeFriend = async (req, res) => {
+  // Not implemented yet
+  res.send("OK");
 };
