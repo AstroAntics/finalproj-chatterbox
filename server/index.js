@@ -10,6 +10,7 @@ import morgan from "morgan";
 import path from "path";
 import { fileURLToPath } from "url";
 import { createAccount } from "./controllers/user.js";
+import secureRoutes from "./routes/secureRoutes.js";
 
 // HANDLE PRE-SETUP VARIABLES
 const fileName = fileURLToPath(import.meta.url); // Set up file path
@@ -60,8 +61,9 @@ const storageBag = multer.diskStorage({
 // Must call the Multer constructor here (read the docs!)
 const uploads = multer({ storageBag });
 
-// ROUTE BLOCK
+// SECURE ROUTE BLOCK
 // TODO move these into separate sections if I have time, otherwise it isn't worth it
+app.use("/secure", secureRoutes);
 
 /**
  * Register an account.
