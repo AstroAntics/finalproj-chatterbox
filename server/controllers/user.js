@@ -1,4 +1,5 @@
 import bcrypt from "bcrypt";
+import { response } from "express";
 import jwt from "jsonwebtoken";
 import Account from "../models/Account.js";
 
@@ -21,7 +22,8 @@ export const createAccount = async (req, res) => {
       likes,
     } = req.body;
     const randomSalt = bcrypt.genSalt(); // Do random bcrypt gen here (thanks StackOverflow)
-    const hashedPw = await bcrypt.hash(password, randomSalt);
+    const cleanPw = password.toString();
+    const hashedPw = await bcrypt.hash(cleanPw, 10);
     const acc = new Account({
       username,
       tag,
@@ -52,12 +54,20 @@ export const loginToAccount = async (req, res) => {
     const { email_addy, password } = req.body;
     const account = Account.findOne({ email: email_addy });
 
-    if (!account) res.status(404).json({ message: "User does not exist." });
+    if (!account) res.status(404).json({ message: "User does not exist." }); // Can't really do anything here :/
 
-    const doPasswordsMatch = await bcrypt.compare(password, account.password);
-    if (!doPasswordsMatch)
-      res.status(403).json({ message: "Incorrect username or password." });
+    const doPasswordsMatch = await bcrypt.compare(password, account.password, () => {});
+    if (!doPasswordsMatch) // Whoops, that's a swing and a miss!
+      res.status(403).json({ message: "Incorrect email address or password." });
+
+    // Sign in using our web token
+    const loginToken = jwt.sign({id: account._id}, process.env.TOKEN_KEY);
+    delete user.password; // Just to make sure we didn't leave anything lying around.
+
+    // Finally, we're done if everything worked out well so far - spit out the token and let's go.
+    res.status(200).json({loginToken, account});
+
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.json({ message: error.message }); // Using .status() triggered a bug, this (supposedly) fixes it.
   }
 };

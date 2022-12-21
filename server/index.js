@@ -23,6 +23,7 @@ const mongoConnectionUrl = process.env.MONGO_CONNECTION_STRING || null;
 
 if (mongoConnectionUrl !== null) {
   mongoose.connect(mongoConnectionUrl).then(() => {
+    mongoose.set('strictQuery', true); // Silence.
     console.log("Connected to MongoDB!");
     app.listen(port, () =>
       console.log(`Chatterbox listening on port ${port}.`)
